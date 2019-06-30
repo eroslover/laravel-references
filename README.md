@@ -26,4 +26,4 @@ $ phpunit
 
 ## License
 
-The MIT License (MIT). Please see [License File](https://github.com/eroslover/laravel-references/blob/master/LICENSE) for more information.
+The MIT License (MIT). Please see [License File](https://github.com/eroslover/laravel-references/blob/master/LICENSE.md) for more information.

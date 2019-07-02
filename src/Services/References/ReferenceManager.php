@@ -26,6 +26,7 @@ class ReferenceManager
      *
      * ReferenceManager constructor.
      * @param ReferenceInterface $model
+     * @throws ReferenceException
      */
     public function __construct(ReferenceInterface $model)
     {
@@ -53,8 +54,8 @@ class ReferenceManager
      *
      * @param Model|EloquentCollection $referencable
      * @param string $collectionName
-     *
-     * @return Collection|Model|mixed
+     * @return ReferenceManager|EloquentCollection|Model
+     * @throws ReferenceException
      */
     public function attach($referencable, string $collectionName = 'default')
     {
@@ -74,6 +75,7 @@ class ReferenceManager
      *
      * @param Model|EloquentCollection $referencable
      * @param string $collectionName
+     * @throws ReferenceException
      */
     public function detach($referencable, $collectionName = 'default'): void
     {
@@ -100,6 +102,7 @@ class ReferenceManager
      *
      * @param Model|EloquentCollection|null $referencable
      * @param string $collectionName
+     * @throws ReferenceException
      */
     public function sync($referencable = null, $collectionName = 'default'): void
     {
@@ -226,7 +229,6 @@ class ReferenceManager
      *
      * @param Model $referencable
      * @param string $collectionName
-     * @return |null
      */
     public function detachSingleModel(Model $referencable, string $collectionName = 'default')
     {

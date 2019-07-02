@@ -1,13 +1,26 @@
 {
     "name": "eroslover/laravel-references",
-    "description": "Model references for laravel",
+    "description": "References between models in Laravel",
     "keywords": [
         "laravel-references",
         "references",
-        "laravel"
+        "laravel",
+        "models",
+        "eroslover"
     ],
+    "homepage": "https://github.com/eroslover/laravel-references",
     "type": "library",
     "license": "MIT",
+    "require": {
+        "php": ">=7.0.0",
+        "illuminate/database": "~5.1",
+        "illuminate/support": "~5.1",
+        "illuminate/contracts": "~5.1",
+        "illuminate/http": "~5.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~5.7"
+    },
     "authors": [
         {
             "name": "Yaroslav Shikovets",
@@ -36,6 +49,5 @@
                 "Eroslover\\References\\ReferencesServiceProvider"
             ]
         }
-    },
-    "minimum-stability": "dev"
+    }
 }

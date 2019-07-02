@@ -113,15 +113,7 @@ trait References
      */
     public function syncRefsRequest(Request $request, string $field = 'references')
     {
-        $items = json_encode([
-            'items' => [
-                ['id' => 4, 'type' => 'news'],
-                ['id' => 5, 'type' => 'news'],
-                ['id' => 6, 'type' => 'news'],
-            ]
-        ]);
-
-        $references = json_decode($items);
+        $references = json_decode($request->get($field));
         $referencable = null;
 
         if ($items = $references->items ?? null) {

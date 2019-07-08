@@ -41,7 +41,6 @@ class ReferenceManager
      * Searches reference by restriction.
      *
      * @param array $restriction
-     *
      * @return ReferenceCollection|null
      */
     public function find(array $restriction = []): ?ReferenceCollection
@@ -53,16 +52,15 @@ class ReferenceManager
      * Creates a new references.
      *
      * @param Model|EloquentCollection $referencable
-     * @param string $collectionName
-     * @return ReferenceManager|EloquentCollection|Model
+     * @return Collection|EloquentCollection|Reference
      * @throws ReferenceException
      */
-    public function attach($referencable, string $collectionName = 'default')
+    public function attach($referencable)
     {
         if ($referencable instanceof Model) {
-            $result = $this->createReference($referencable, $collectionName);
+            $result = $this->createReference($referencable);
         } elseif ($referencable instanceof EloquentCollection || $referencable instanceof Collection) {
-            $result = $this->createReferences($referencable, $collectionName);
+            $result = $this->createReferences($referencable);
         } else {
             throw ReferenceException::invalidArgument();
         }
@@ -74,15 +72,14 @@ class ReferenceManager
      * Get rid of existing references.
      *
      * @param Model|EloquentCollection $referencable
-     * @param string $collectionName
      * @throws ReferenceException
      */
-    public function detach($referencable, $collectionName = 'default'): void
+    public function detach($referencable): void
     {
         if ($referencable instanceof Model) {
-            $this->detachSingleModel($referencable, $collectionName);
+            $this->detachSingleModel($referencable);
         } elseif ($referencable instanceof EloquentCollection || $referencable instanceof Collection) {
-            $this->detachMultipleModels($referencable, $collectionName);
+            $this->detachMultipleModels($referencable);
         } else {
             throw ReferenceException::invalidArgument();
         }
@@ -101,17 +98,16 @@ class ReferenceManager
      * Sync references for current entity.
      *
      * @param Model|EloquentCollection|null $referencable
-     * @param string $collectionName
      * @throws ReferenceException
      */
-    public function sync($referencable = null, $collectionName = 'default'): void
+    public function sync($referencable = null): void
     {
         if (!$referencable) {
             $this->detachAll();
         } elseif ($referencable instanceof Model) {
-            $this->syncOne($referencable, $collectionName);
+            $this->syncOne($referencable);
         } elseif ($referencable instanceof EloquentCollection || $referencable instanceof Collection) {
-            $this->syncMorphMany($referencable, $collectionName);
+            $this->syncMorphMany($referencable);
         } else {
             throw ReferenceException::invalidArgument();
         }
@@ -121,9 +117,8 @@ class ReferenceManager
      * Sync one reference by given entity.
      *
      * @param Model $referencable
-     * @param string $collectionName
      */
-    public function syncOne(Model $referencable, $collectionName = 'default'): void
+    public function syncOne(Model $referencable): void
     {
         // Detach every reference except referencable
         $class = get_class($referencable);
@@ -132,18 +127,17 @@ class ReferenceManager
         $referencesOfClass = $this->getModelReferences();
 
         if ($referencesOfClass instanceof ReferenceCollection) {
-            $delete = $referencesOfClass->filter(function ($item) use ($referencableId, $collectionName, $class) {
+            $delete = $referencesOfClass->filter(function ($item) use ($referencableId, $class) {
                 return !(
                     (int) $item->reference_id === (int) $referencableId &&
-                    $item->reference_type === $class &&
-                    $item->collection === $collectionName
+                    $item->reference_type === $class
                 );
             });
 
             Reference::destroy($delete->pluck('id')->toArray());
         } else {
             $this->detachAll();
-            $this->createReference($referencable, $collectionName);
+            $this->createReference($referencable);
         }
     }
 
@@ -151,38 +145,35 @@ class ReferenceManager
      * Sync for morphMany relation.
      *
      * @param Collection|EloquentCollection $refModels
-     * @param string $collectionName
      */
-    public function syncMorphMany($refModels, $collectionName = 'default'): void
+    public function syncMorphMany($refModels): void
     {
         $references = $this->getModelReferences();
 
         // Look for reference ids to detach
-        $detachIds = $references->filter(function ($reference) use ($refModels, $collectionName) {
-            return !$refModels->contains(function ($refModel) use ($reference, $collectionName) {
+        $detachIds = $references->filter(function ($reference) use ($refModels) {
+            return !$refModels->contains(function ($refModel) use ($reference) {
                 return (
                     (int) $refModel->id === (int) $reference->reference_id &&
-                    get_class($refModel) === $reference->reference_type &&
-                    $collectionName === $reference->collection
+                    get_class($refModel) === $reference->reference_type
                 );
             });
         })->pluck('id')->toArray();
 
         // Look for models data to attach
-        $attachData = $refModels->filter(function ($refModel) use ($references, $collectionName) {
-            return !$references->contains(function ($reference) use ($refModel, $collectionName) {
+        $attachData = $refModels->filter(function ($refModel) use ($references) {
+            return !$references->contains(function ($reference) use ($refModel) {
                 return (
                     (int) $refModel->id === (int) $reference->reference_id &&
-                    get_class($refModel) === $reference->reference_type &&
-                    $collectionName === $reference->collection
+                    get_class($refModel) === $reference->reference_type
                 );
             });
         });
 
         Reference::destroy($detachIds);
 
-        $attachData->each(function ($item) use ($collectionName) {
-            $this->createReference($item, $collectionName);
+        $attachData->each(function ($item) {
+            $this->createReference($item);
         });
     }
 
@@ -190,16 +181,13 @@ class ReferenceManager
      * Creates single reference.
      *
      * @param Model $referencable
-     * @param string $collectionName
-     *
-     * @return $this|Model
+     * @return Reference
      */
-    protected function createReference(Model $referencable, string $collectionName = 'default'): Model
+    protected function createReference(Model $referencable): Reference
     {
         return $this->model->references()->updateOrCreate([
             'reference_id'   => $referencable->id,
-            'reference_type' => get_class($referencable),
-            'collection'     => $collectionName ?: null,
+            'reference_type' => get_class($referencable)
         ]);
     }
 
@@ -207,17 +195,14 @@ class ReferenceManager
      * Creates multiple references.
      *
      * @param EloquentCollection|Collection $collection
-     * @param string $collectionName
-     *
      * @return EloquentCollection
      */
-    protected function createReferences($collection, string $collectionName = 'default'): EloquentCollection
+    protected function createReferences($collection): EloquentCollection
     {
-        $data = $collection->map(function ($referencable, $key) use ($collectionName) {
+        $data = $collection->map(function ($referencable) {
             return [
                 'reference_id'   => $referencable->id,
-                'reference_type' => get_class($referencable),
-                'collection'     => $collectionName ?: null,
+                'reference_type' => get_class($referencable)
             ];
         });
 
@@ -228,14 +213,12 @@ class ReferenceManager
      * Finds reference by model and removes it.
      *
      * @param Model $referencable
-     * @param string $collectionName
      */
-    public function detachSingleModel(Model $referencable, string $collectionName = 'default')
+    protected function detachSingleModel(Model $referencable)
     {
         $reference = $this->find([
             ['reference_id', '=', $referencable->id],
-            ['reference_type', '=', get_class($referencable)],
-            ['collection', '=', $collectionName],
+            ['reference_type', '=', get_class($referencable)]
         ])->first();
 
         if ($reference) {
@@ -247,20 +230,18 @@ class ReferenceManager
      * Find references by given models and removes them.
      *
      * @param EloquentCollection|Collection $referencedCollection
-     * @param string $collectionName
      */
-    protected function detachMultipleModels($referencedCollection, string $collectionName = 'default'): void
+    protected function detachMultipleModels($referencedCollection): void
     {
         $refs = $this->getModelReferences();
 
         if ($refs->isNotEmpty()) {
             // find reference in referencable and delete reference entry if exists
-            $referencedCollection->each(function ($referencedModel) use ($refs, $collectionName) {
-                $reference = $refs->first(function ($reference) use ($referencedModel, $collectionName) {
+            $referencedCollection->each(function ($referencedModel) use ($refs) {
+                $reference = $refs->first(function ($reference) use ($referencedModel) {
                     return (
                         (int) $reference->reference_id === (int) $referencedModel->id &&
-                        $reference->reference_type === get_class($referencedModel) &&
-                        $reference->collection === $collectionName
+                        $reference->reference_type === get_class($referencedModel)
                     );
                 });
 
@@ -276,7 +257,7 @@ class ReferenceManager
      *
      * @return ReferenceCollection
      */
-    public function getModelReferences(): ReferenceCollection
+    protected function getModelReferences(): ReferenceCollection
     {
         $references = $this->model->references()->get();
 

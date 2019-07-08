@@ -2,7 +2,6 @@
 
 namespace Eroslover\References;
 
-use Eroslover\References\Services\Registries\EntityRegistry;
 use Illuminate\Support\ServiceProvider;
 
 class ReferencesServiceProvider extends ServiceProvider
@@ -33,8 +32,5 @@ class ReferencesServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/references.php', 'references');
-        $this->app->singleton(EntityRegistry::class, function ($app) {
-            return new EntityRegistry();
-        });
     }
 }

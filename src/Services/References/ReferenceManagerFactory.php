@@ -2,6 +2,7 @@
 
 namespace Eroslover\References\Services\References;
 
+use Eroslover\References\Exceptions\ReferenceException;
 use Eroslover\References\Interfaces\ReferenceInterface;
 
 class ReferenceManagerFactory
@@ -9,7 +10,7 @@ class ReferenceManagerFactory
     /**
      * @param ReferenceInterface $model
      * @return ReferenceManager
-     * @throws \Exception
+     * @throws ReferenceException
      */
     public function create(ReferenceInterface $model): ReferenceManager
     {

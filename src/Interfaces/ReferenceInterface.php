@@ -8,6 +8,7 @@ interface ReferenceInterface
 {
     /**
      * References relation
+     *
      * @return mixed
      */
     public function references(): Relation;

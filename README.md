@@ -95,10 +95,90 @@ class Location extends Model {}
 class Event extends Model {}
 ```
 
+##### Making references
+
+The `ref` method accepts `Model` or `Collection` of models to place on the references table:
+
+```php
+$photo = Photo::find(1);
+
+$location = Location::find(3);
+$persons = Person::whereLocation($location->id)->get();
+$event = Event::first();
+
+$photo->ref($location);
+$photo->ref($persons);
+$photo->ref($event);
+```
+
+##### Removing references
+
+The `unref` method accepts `Model` or `Collection` of models to remove from the references table:
+
+```php
+$photo->unref($location);
+```
+
+##### Syncing references
+
+The `syncRefs` method accepts `null`, `Model` or `Collection` of models to place or remove from the references table. Any models that are not in the given collection will be removed from the references table. So, after this operation is complete, only the models in the given collection will exist in the reference table for chosen model:
+
+```php
+$photo->syncRefs($referencable);
+```
+
+##### Retrieving references
+
+The `loadReferences` method returns collection of referenced models. Accepts boolean `$grouped` parameter. By default method returns mapped collection where key is namespace and value is a collection of entities. If you need just get a collection of referenced entities, you need to pass `false` to method as an argument:
+
+```php
+$photo->loadReferences();
+
+Output:
+
+ReferenceCollection {#1715 ▼
+  #items: array:3 [▼
+    "App\Modules\Location" => Collection {#1730 ▼
+      #items: array:1 [▼
+        0 => Location {#1731 ▶}
+      ]
+    }
+    "App\Modules\Person" => Collection {#1733 ▼
+      #items: array:2 [▼
+        0 => Person {#1734 ▶}
+        1 => Person {#1735 ▶}
+      ]
+    }
+    "App\Modules\Event" => Collection {#1737 ▼
+      #items: array:1 [▼
+        0 => Event {#1738 ▶}
+      ]
+    }
+  ]
+}
+```
+
+```php
+$photo->loadReferences(false);
+
+Output:
+
+Collection {#1716 ▼
+  #items: array:4 [▼
+    0 => Location {#1731 ▶}
+    1 => Person {#1732 ▶}
+    2 => Person {#1734 ▶}
+    3 => Event {#1735 ▶}
+  ]
+}
+```
+
 ## Testing
 
+You can run the tests with:
+
 ``` bash
-$ phpunit
+$ vendor/bin/phpunit
 ```
 
 ## License

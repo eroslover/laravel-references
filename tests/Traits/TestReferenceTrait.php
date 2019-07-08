@@ -2,7 +2,6 @@
 
 namespace Eroslover\References\Tests\Traits;
 
-use Eroslover\References\Services\Registries\EntityRegistry;
 use Eroslover\References\Tests\Mock\Models\ReferencedModelA;
 use Eroslover\References\Tests\Mock\Models\ReferencedModelB;
 use Eroslover\References\Tests\Mock\Models\ReferencingModel;
@@ -43,19 +42,5 @@ trait TestReferenceTrait
         $factory->define(ReferencingModel::class, $returnArray);
         $factory->define(ReferencedModelA::class, $returnArray);
         $factory->define(ReferencedModelB::class, $returnArray);
-    }
-
-    public function references()
-    {
-        $this->app->make(EntityRegistry::class)->add(ReferencedModelA::class, 'referenced_model_a');
-
-        $referencedACollection = factory(ReferencedModelA::class, 5)->create();
-
-        return $referencedACollection->map(function ($referencedModel) {
-            return [
-                'id' => $referencedModel->id,
-                'type' => 'referenced_model_a'
-            ];
-        });
     }
 }

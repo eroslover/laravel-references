@@ -22,7 +22,17 @@ class Reference extends Model
         'reference_type',
     ];
 
-    protected $table = 'references';
+    /**
+     * Constructor method.
+     *
+     * @param array $attributes
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->table = config('references.table_name');
+    }
 
     /**
      * Create the polymorphic relation.

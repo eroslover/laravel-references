@@ -2,15 +2,10 @@
 
 namespace Eroslover\References\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\CreatesApplication;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
-abstract class TestCase extends BaseTestCase
+class TestCase extends PHPUnitTestCase
 {
-    use CreatesApplication, WithFaker, RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();

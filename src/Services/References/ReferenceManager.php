@@ -183,6 +183,24 @@ class ReferenceManager
     }
 
     /**
+     * Load entities related via references
+     *
+     * @param bool $grouped
+     *
+     * @return Collection
+     */
+    public function load(bool $grouped = true): Collection
+    {
+        $loadedRefs = new Collection();
+
+        if ($references = $this->getModelReferences()) {
+            $loadedRefs = $references->loadGrouped();
+        }
+
+        return $grouped ? $loadedRefs : $loadedRefs->flatten();
+    }
+
+    /**
      * Creates single reference.
      *
      * @param Model $referencable
@@ -206,11 +224,18 @@ class ReferenceManager
      */
     protected function createReferences($collection): EloquentCollection
     {
+        $availableReferences = $this->model->references()->get();
+
         $data = $collection->map(function ($referencable) {
             return [
                 'reference_id'   => $referencable->id,
                 'reference_type' => get_class($referencable)
             ];
+        })->filter(function ($item) use ($availableReferences) {
+            return $availableReferences
+                ->where('reference_type', $item['reference_type'])
+                ->where('reference_id', $item['reference_id'])
+                ->isEmpty();
         });
 
         return $this->model->references()->createMany($data->toArray());

@@ -68,7 +68,7 @@ trait References
      *
      * @return mixed
      */
-    public function syncRefs($referencable)
+    public function syncRefs($referencable = null)
     {
         return app(ReferenceManagerFactory::class)
             ->create($this)
@@ -84,17 +84,8 @@ trait References
      */
     public function loadReferences($grouped = true): Collection
     {
-        $loadedRefs = new Collection();
-
-        if ($references = $this->references()->get()) {
-            $loadedRefs = $references->groupBy('reference_type')
-                ->mapWithKeys(function($items, $key) {
-                    $ids = $items->pluck('reference_id')->toArray();
-
-                    return [$key => $key::whereIn('id', $ids)->get()];
-                });
-        }
-
-        return $grouped ? $loadedRefs : $loadedRefs->flatten();
+        return app(ReferenceManagerFactory::class)
+            ->create($this)
+            ->load($grouped);
     }
 }

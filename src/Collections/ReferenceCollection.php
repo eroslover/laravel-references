@@ -25,8 +25,10 @@ class ReferenceCollection extends Collection
      */
     public function loadGrouped()
     {
-        return $this->grouped()->map(function ($collection, $namespace) {
-            return $namespace::whereIn('id', $collection->pluck('id'))->get();
+        return $this->grouped()->mapWithKeys(function ($collection, $namespace) {
+            $ids = $collection->pluck('reference_id')->all();
+
+            return [$namespace => $namespace::whereIn('id', $ids)->get()];
         });
     }
 }

@@ -19,7 +19,6 @@ class CreateReferencesTable extends Migration
             $table->string('model_type');
             $table->integer('reference_id');
             $table->string('reference_type');
-            $table->string('collection')->default('default');
 
             $table->timestamps();
 

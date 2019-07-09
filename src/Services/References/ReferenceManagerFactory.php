@@ -8,7 +8,10 @@ use Eroslover\References\Interfaces\ReferenceInterface;
 class ReferenceManagerFactory
 {
     /**
+     * Create a ReferenceManager
+     *
      * @param ReferenceInterface $model
+     *
      * @return ReferenceManager
      * @throws ReferenceException
      */

@@ -24,10 +24,30 @@ class ReferencesTest extends TestCase
     /**
      * @group references
      */
+    public function testReferencesAttachOne()
+    {
+        $referencing = factory(ReferencingModel::class)->create();
+        $referencedA = factory(ReferencedModelA::class)->create();
+
+        $referencing->ref($referencedA);
+        $refs = $referencing->references()->get();
+
+        $contains = $refs->contains(function($ref) use ($referencedA) {
+            return (
+                (int) $ref->reference_id === (int) $referencedA->id &&
+                $ref->reference_type === get_class($referencedA)
+            );
+        });
+
+        $this->assertTrue($contains, 'Single reference was successfully created');
+    }
+
+    /**
+     * @group references
+     */
     public function testReferencesAttachMany()
     {
         $referencing = factory(ReferencingModel::class)->create();
-
         $referencedACollection = factory(ReferencedModelA::class, 5)->create();
         $referencedBCollection = factory(ReferencedModelB::class, 5)->create();
 
@@ -40,8 +60,8 @@ class ReferencesTest extends TestCase
         $this->assertInstanceOf(
             ReferenceCollection::class,
             $refs,
-            'Got all references in the ' . ReferenceCollection::class);
-
+            'Got all references in the ' . ReferenceCollection::class
+        );
 
         // Test if the references were saved properly
 
@@ -49,11 +69,9 @@ class ReferencesTest extends TestCase
         $result = false;
 
         if ($refs instanceof ReferenceCollection) {
-
             $result = true;
 
             foreach($allReferenced as $referenced) {
-
                 $contains = $refs->contains(function($ref) use ($referenced) {
                     return (
                         (int) $ref->reference_id === (int) $referenced->id &&
@@ -71,26 +89,6 @@ class ReferencesTest extends TestCase
         $this->assertTrue($result, 'All references were successfully created');
     }
 
-    /**
-     * @group references
-     */
-    public function testReferencesAttachOne()
-    {
-        $referencing = factory(ReferencingModel::class)->create();
-
-        $referencedA = factory(ReferencedModelA::class)->create();
-
-        $referencing->ref($referencedA);
-        $refs = $referencing->references()->get();
-
-        $contains = $refs->contains(function($ref) use ($referencedA) {
-            return (
-                (int) $ref->reference_id === (int) $referencedA->id &&
-                $ref->reference_type === get_class($referencedA)
-            );
-        });
-        $this->assertTrue($contains, 'Single reference was successfully created');
-    }
 
     /**
      * @group references
@@ -98,7 +96,6 @@ class ReferencesTest extends TestCase
     public function testReferencesDetachOne()
     {
         $referencing = factory(ReferencingModel::class)->create();
-
         $referencedA = factory(ReferencedModelA::class)->create();
 
         $referencing->ref($referencedA);
@@ -110,6 +107,7 @@ class ReferencesTest extends TestCase
                 $ref->reference_type === get_class($referencedA)
             );
         });
+
         $this->assertTrue($contains, 'Single reference was successfully created');
 
         $referencing->unref($referencedA);
@@ -121,8 +119,8 @@ class ReferencesTest extends TestCase
                 $ref->reference_type === get_class($referencedA)
             );
         });
-        $this->assertFalse($contains, 'Single reference was successfully detached');
 
+        $this->assertFalse($contains, 'Single reference was successfully detached');
     }
 
     /**
@@ -144,7 +142,8 @@ class ReferencesTest extends TestCase
         $this->assertInstanceOf(
             ReferenceCollection::class,
             $refs,
-            'Got all references in the ' . ReferenceCollection::class);
+            'Got all references in the ' . ReferenceCollection::class
+        );
 
 
         // Test if the references were saved properly
@@ -153,11 +152,9 @@ class ReferencesTest extends TestCase
         $result = false;
 
         if ($refs instanceof ReferenceCollection) {
-
             $result = true;
 
             foreach($allReferenced as $referenced) {
-
                 $contains = $refs->contains(function($ref) use ($referenced) {
                     return (
                         (int) $ref->reference_id === (int) $referenced->id &&
@@ -180,11 +177,9 @@ class ReferencesTest extends TestCase
         $refs = $referencing->references()->get();
 
         if ($refs instanceof ReferenceCollection) {
-
             $unrefResult = true;
 
             foreach($referencedBCollection as $referenced) {
-
                 $contains = $refs->contains(function($ref) use ($referenced) {
                     return (
                         (int) $ref->reference_id === (int) $referenced->id &&
@@ -200,7 +195,6 @@ class ReferencesTest extends TestCase
         }
 
         $this->assertTrue($unrefResult, 'All references were successfully deleted');
-
     }
 
     /**
@@ -218,12 +212,11 @@ class ReferencesTest extends TestCase
 
         $referencing->syncRefs($referencedACollection->first());
 
-        $this->assertEquals(
+        $this->assertCount(
             1,
-            $referencing->references()->count(),
+            $referencing->references()->get(),
             'References were successfully synchronized. All the reference were deleted except the one'
         );
-
     }
 
     /**
@@ -236,19 +229,18 @@ class ReferencesTest extends TestCase
         $referencedACollection = factory(ReferencedModelA::class, 5)->create();
         $referencedBCollection = factory(ReferencedModelB::class, 5)->create();
 
-        $AnotherReferencedBCollection = factory(ReferencedModelB::class, 2)->create();
+        $anotherReferencedBCollection = factory(ReferencedModelB::class, 2)->create();
 
         $referencing->ref($referencedACollection);
         $referencing->ref($referencedBCollection);
 
-        $referencing->syncRefs($AnotherReferencedBCollection);
+        $referencing->syncRefs($anotherReferencedBCollection);
 
-        $this->assertEquals(
+        $this->assertCount(
             2,
-            $referencing->references()->count(),
+            $referencing->references()->get(),
             'References were successfully synchronized. All the reference were deleted except the one'
         );
-
     }
 
     /**
@@ -258,25 +250,23 @@ class ReferencesTest extends TestCase
     {
         $referencing = factory(ReferencingModel::class)->create();
 
-        $AnotherReferencedBCollection = factory(ReferencedModelB::class, 5)->create();
+        $anotherReferencedBCollection = factory(ReferencedModelB::class, 5)->create();
 
-        $referencing->syncRefs($AnotherReferencedBCollection);
+        $referencing->syncRefs($anotherReferencedBCollection);
 
-        $this->assertEquals(
-            $AnotherReferencedBCollection->count(),
-            $referencing->references()->count()
+        $this->assertCount(
+            $anotherReferencedBCollection->count(),
+            $referencing->references()->get()
         );
 
         $referencing->delete();
 
-        $this->assertEquals(
-            0,
-            Reference::where('model_type', get_class($referencing))->where('model_id', $referencing->id)->count()
+        $this->assertEmpty(
+            Reference::where('model_type', get_class($referencing))->where('model_id', $referencing->id)->get()
         );
 
-        $this->assertEquals(
-            0,
-            Reference::where('reference_type', get_class($referencing))->where('reference_id', $referencing->id)->count()
+        $this->assertEmpty(
+            Reference::where('reference_type', get_class($referencing))->where('reference_id', $referencing->id)->get()
         );
     }
 }

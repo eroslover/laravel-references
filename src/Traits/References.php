@@ -51,6 +51,7 @@ trait References
      * Remove references
      *
      * @param Model|EloquentCollection $referencable
+     *
      * @return mixed
      */
     public function unref($referencable)

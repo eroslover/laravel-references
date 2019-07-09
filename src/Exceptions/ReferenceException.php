@@ -6,6 +6,7 @@ class ReferenceException extends \Exception
 {
     /**
      * @param string $model
+     *
      * @return ReferenceException
      */
     public static function invalidModelInstance(string $model)

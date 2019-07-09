@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Class ReferenceManager for making references between entities.
+ *
  * @package App\Services\References
  */
 class ReferenceManager
@@ -24,8 +25,8 @@ class ReferenceManager
     /**
      * ReferenceManager constructor.
      *
-     * ReferenceManager constructor.
      * @param ReferenceInterface $model
+     *
      * @throws ReferenceException
      */
     public function __construct(ReferenceInterface $model)
@@ -41,6 +42,7 @@ class ReferenceManager
      * Searches reference by restriction.
      *
      * @param array $restriction
+     *
      * @return ReferenceCollection|null
      */
     public function find(array $restriction = []): ?ReferenceCollection
@@ -52,6 +54,7 @@ class ReferenceManager
      * Creates a new references.
      *
      * @param Model|EloquentCollection $referencable
+     *
      * @return Collection|EloquentCollection|Reference
      * @throws ReferenceException
      */
@@ -72,6 +75,7 @@ class ReferenceManager
      * Get rid of existing references.
      *
      * @param Model|EloquentCollection $referencable
+     *
      * @throws ReferenceException
      */
     public function detach($referencable): void
@@ -98,6 +102,7 @@ class ReferenceManager
      * Sync references for current entity.
      *
      * @param Model|EloquentCollection|null $referencable
+     *
      * @throws ReferenceException
      */
     public function sync($referencable = null): void
@@ -181,6 +186,7 @@ class ReferenceManager
      * Creates single reference.
      *
      * @param Model $referencable
+     *
      * @return Reference
      */
     protected function createReference(Model $referencable): Reference
@@ -195,6 +201,7 @@ class ReferenceManager
      * Creates multiple references.
      *
      * @param EloquentCollection|Collection $collection
+     *
      * @return EloquentCollection
      */
     protected function createReferences($collection): EloquentCollection

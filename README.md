@@ -26,13 +26,13 @@ $photo->ref($persons);
 ## Installation
 
 
-You can install this package via composer using this command:
+You can install the package via composer:
 
 ``` bash
 $ composer require eroslover/laravel-references
 ```
 
-**If you're using Laravel 5.5 or greater this package will be auto-discovered, however if you're using anything lower than 5.5 you will need to register it the old way:**
+The service provider will automatically get registered. Or you may manually add the service provider in your config/app.php file:
 
 ```php
 'providers' => [
@@ -68,7 +68,7 @@ php artisan migrate
 
 ## Usage
 
-Choose the model you want to add references to. As in example above I'll choose `Photo`. This class should implement `ReferencesInterface` and import `References` trait.
+Choose the model you want to add references to. As in example above, I'll choose `Photo`. This class should implement `ReferencesInterface` and import `References` trait.
 
 ```php
 namespace App;
@@ -97,7 +97,7 @@ class Event extends Model {}
 
 ##### Making references
 
-The `ref` method accepts `Model` or `Collection` of models to place on the references table:
+The `ref` method accepts `Model` or `Collection` of models to put data in a references table:
 
 ```php
 $photo = Photo::find(1);
@@ -113,7 +113,7 @@ $photo->ref($event);
 
 ##### Removing references
 
-The `unref` method accepts `Model` or `Collection` of models to remove from the references table:
+The `unref` method accepts `Model` or `Collection` of models to remove them from the references table:
 
 ```php
 $photo->unref($location);
@@ -121,7 +121,7 @@ $photo->unref($location);
 
 ##### Syncing references
 
-The `syncRefs` method accepts `null`, `Model` or `Collection` of models to place or remove from the references table. Any models that are not in the given collection will be removed from the references table. So, after this operation is complete, only the models in the given collection will exist in the reference table for chosen model:
+The `syncRefs` method accepts `null`, `Model` or `Collection` of models to put data or remove data from the references table. Any models that are not in the given collection will be removed from the references table. So, when this operation is complete, only models in the given collection will exist in the reference table for chosen model:
 
 ```php
 $photo->syncRefs($referencable);
@@ -129,7 +129,7 @@ $photo->syncRefs($referencable);
 
 ##### Retrieving references
 
-The `loadReferences` method returns collection of referenced models. Accepts boolean `$grouped` parameter. By default method returns mapped collection where key is namespace and value is a collection of entities. If you need just get a collection of referenced entities, you need to pass `false` to method as an argument:
+The `loadReferences` method returns the collection of referenced models. Accepts boolean `$grouped` parameter. By default, method returns mapped collection where the key is namespace and value is a collection of entities. If you need to get a collection of referenced entities only, you'll need to pass `false` to method as an argument:
 
 ```php
 $photo->loadReferences();
@@ -175,7 +175,7 @@ Collection {#1716 ▼
 
 ## Testing
 
-You can run the tests with:
+You can run tests with:
 
 ``` bash
 $ vendor/bin/phpunit
